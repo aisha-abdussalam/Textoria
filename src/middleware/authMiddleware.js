@@ -9,9 +9,9 @@ export const authMiddleware = async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         token = req.headers.authorization.split(" ")[1];
     }
-    // else if (req.cookies?.jwt) {
-    //     token = req.cookies.jwt;
-    // }
+    else if (req.cookies?.jwt) {
+        token = req.cookies.jwt;
+    }
 
     if (!token) {
         return res.status(401).json({
@@ -24,10 +24,15 @@ export const authMiddleware = async (req, res, next) => {
 
         const user = await prisma.user.findUnique({
             where: {
-                id: decoded.id,
-                select: { id: true, email: true, name: true, role: true }
+                id: decoded.id
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true
             }
-        })
+        });
 
         if (!user) {
             return res.status(401).json({
